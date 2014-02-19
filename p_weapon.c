@@ -763,6 +763,10 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	int		damage;
 	float	damage_radius;
 	int		radius_damage;
+	int     speed;
+	int     direction;
+	int     temp_direction;
+	const int max_speed = 1000;
 
 	damage = 100 + (int)(random() * 20.0);
 	radius_damage = 120;
@@ -780,7 +784,28 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
+
+	// gives a number between 0 - 1
+	temp_direction = rand() % 2;
+	if (temp_direction == 0)
+	{
+		direction = -1;
+	}
+	// if there is a third choice to fall though, uncomment this
+	else // if (temp_direction = 1)
+	{
+		direction = 1;
+	}
+	
+	// fires at speed between 1 and max_speed
+	// default speed is 650
+	speed = rand() % max_speed + 1;
+	// fires rockets randomly either forwards or backwards
+	// negative is backwards
+	speed *= direction;
+
+	fire_rocket(ent, start, forward, damage, speed, damage_radius, radius_damage);
+
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
