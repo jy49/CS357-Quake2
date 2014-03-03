@@ -878,13 +878,14 @@ void Quadlaser_Fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, i
 	VectorScale(forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_blaster(ent,  start, forward, damage, 750, effect, hyper);
-	fire_blaster(ent, leftup, forward, damage, 750, effect, hyper);
+	fire_blaster(ent,  start, forward, damage, 575, effect, hyper);
+	fire_blaster(ent, leftup, forward, damage, 575, effect, hyper);
 
+	// TODO: add quadlaser powerup and check for it
 //	if (is_quadlaser)
 	{
-		fire_blaster(ent, leftdown, forward, damage, 750, effect, hyper);
-		fire_blaster(ent, rightdown, forward, damage, 750, effect, hyper);
+		fire_blaster(ent, leftdown, forward, damage, 575, effect, hyper);
+		fire_blaster(ent, rightdown, forward, damage, 575, effect, hyper);
 	}
 	// send muzzle flash
 	gi.WriteByte(svc_muzzleflash);
@@ -1007,6 +1008,7 @@ MACHINEGUN / CHAINGUN
 ======================================================================
 */
 
+// TODO: Make Plasma cannon fire slower
 void Machinegun_Fire (edict_t *ent)
 {
 	int	i;
@@ -1089,8 +1091,9 @@ void Machinegun_Fire (edict_t *ent)
 //	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 //	fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
 
-	fire_blaster(ent, leftup, forward, damage, 750, effect, hyper);
-	fire_blaster(ent, rightup, forward, damage, 750, effect, hyper);
+	fire_blaster(ent, leftup, forward, damage, 1000, effect, hyper);
+	fire_blaster(ent, rightup, forward, damage, 1000, effect, hyper);
+
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
