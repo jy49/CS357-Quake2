@@ -1135,12 +1135,16 @@ void Chaingun_Fire (edict_t *ent)
 	float		r, u;
 	vec3_t		offset;
 	int			damage;
-	int			kick = 2;
+	int			kick = 0;	// Vulcan cannon has no recoil
 
 	if (deathmatch->value)
+	{
 		damage = 6;
+	}
 	else
+	{
 		damage = 8;
+	}
 
 	if (ent->client->ps.gunframe == 5)
 		gi.sound(ent, CHAN_AUTO, gi.soundindex("weapons/chngnu1a.wav"), 1, ATTN_IDLE, 0);
@@ -1215,17 +1219,17 @@ void Chaingun_Fire (edict_t *ent)
 		kick *= 4;
 	}
 
-	for (i=0 ; i<3 ; i++)
-	{
-		ent->client->kick_origin[i] = crandom() * 0.35;
-		ent->client->kick_angles[i] = crandom() * 0.7;
-	}
+//	for (i=0 ; i<3 ; i++)
+//	{
+//		ent->client->kick_origin[i] = crandom() * 0.35;
+//		ent->client->kick_angles[i] = crandom() * 0.7;
+//	}
 
 	for (i=0 ; i<shots ; i++)
 	{
 		// get start / end positions
 		AngleVectors (ent->client->v_angle, forward, right, up);
-		r = 7 + crandom()*4;
+		r = 3 + crandom()*4;
 		u = crandom()*4;
 		VectorSet(offset, 0, r, u + ent->viewheight-8);
 		P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
