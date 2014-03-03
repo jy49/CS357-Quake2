@@ -771,8 +771,9 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	float	damage_radius;
 	int		radius_damage;
 
-	damage = 100 + (int)(random() * 20.0);
-	radius_damage = 120;
+	// TODO: damage numbers/splash damage range likely dont match real ones
+	damage = 35;
+	radius_damage = 25;
 	damage_radius = 120;
 	if (is_quad)
 	{
@@ -787,7 +788,9 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
+
+	// TODO: add in left/right fire port tracking
+	fire_rocket (ent, start, forward, damage, 600, damage_radius, radius_damage);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -911,6 +914,7 @@ void Weapon_Blaster_Fire (edict_t *ent)
 {
 	int		damage;
 
+	// TODO: Add in difficulty levels
 	if (deathmatch->value)
 		damage = 15;
 	else
@@ -1022,6 +1026,7 @@ void Machinegun_Fire (edict_t *ent)
 	vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		angles;
+	// TODO: Add in difficulty levels
 	int			damage = 8;
 	int			kick = 0;	// Descent weapons have no kick
 	vec3_t		offset;
@@ -1144,6 +1149,7 @@ void Chaingun_Fire (edict_t *ent)
 	int			damage;
 	int			kick = 0;	// Vulcan cannon has no recoil
 
+	// TODO: Add in difficulty levels
 	if (deathmatch->value)
 	{
 		damage = 6;
