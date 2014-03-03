@@ -843,6 +843,60 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 }
 
+void Quadlaser_Fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, int effect)
+{
+	vec3_t	forward, right;
+	vec3_t	start;
+	vec3_t	offset;
+	vec3_t  leftup, leftupoffset,
+			leftdown, leftdownoffset,
+			rightdown, rightdownoffset;
+
+	if (is_quad)
+	{
+		damage *= 4;
+	}
+	AngleVectors(ent->client->v_angle, forward, right, NULL);
+	VectorSet(offset, 20, 16, ent->viewheight - 8);
+	VectorAdd(offset, g_offset, offset);
+	VectorSet(leftupoffset, 20, -16, ent->viewheight - 8);
+	VectorAdd(leftupoffset, g_offset, leftupoffset);
+	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+	P_ProjectSource(ent->client, ent->s.origin, leftupoffset, forward, right, leftup);
+
+//	if (is_quadlaser)
+	{
+		VectorSet(leftdownoffset, 20, 32, ent->viewheight - 20);
+		VectorAdd(leftdownoffset, g_offset, leftdownoffset);
+		VectorSet(rightdownoffset, 20, -32, ent->viewheight - 20);
+		VectorAdd(rightdownoffset, g_offset, rightdownoffset);
+		P_ProjectSource(ent->client, ent->s.origin, leftdownoffset, forward, right, leftdown);
+		P_ProjectSource(ent->client, ent->s.origin, rightdownoffset, forward, right, rightdown);
+	}
+
+	VectorScale(forward, -2, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -1;
+
+	fire_blaster(ent,  start, forward, damage, 750, effect, hyper);
+	fire_blaster(ent, leftup, forward, damage, 750, effect, hyper);
+
+//	if (is_quadlaser)
+	{
+		fire_blaster(ent, leftdown, forward, damage, 750, effect, hyper);
+		fire_blaster(ent, rightdown, forward, damage, 750, effect, hyper);
+	}
+	// send muzzle flash
+	gi.WriteByte(svc_muzzleflash);
+	gi.WriteShort(ent - g_edicts);
+	if (hyper)
+		gi.WriteByte(MZ_HYPERBLASTER | is_silenced);
+	else
+		gi.WriteByte(MZ_BLASTER | is_silenced);
+	gi.multicast(ent->s.origin, MULTICAST_PVS);
+
+	PlayerNoise(ent, start, PNOISE_WEAPON);
+}
+
 
 void Weapon_Blaster_Fire (edict_t *ent)
 {
@@ -852,7 +906,9 @@ void Weapon_Blaster_Fire (edict_t *ent)
 		damage = 15;
 	else
 		damage = 10;
-	Blaster_Fire (ent, vec3_origin, damage, false, EF_BLASTER);
+
+	Quadlaser_Fire(ent, vec3_origin, damage, false, EF_BLASTER);
+	
 	ent->client->ps.gunframe++;
 }
 
