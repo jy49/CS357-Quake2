@@ -231,8 +231,14 @@ void ChangeWeapon (edict_t *ent)
 NoAmmoWeaponChange
 =================
 */
+
+//	Descent does not manage ammo in same way as quake
+//	FIXME: Switching ammo wouldn't do anything meaningful
+//
+//	TODO: change ammo types to energy+vulcan ammo
 void NoAmmoWeaponChange (edict_t *ent)
 {
+	/*
 	if ( ent->client->pers.inventory[ITEM_INDEX(FindItem("slugs"))]
 		&&  ent->client->pers.inventory[ITEM_INDEX(FindItem("railgun"))] )
 	{
@@ -270,6 +276,7 @@ void NoAmmoWeaponChange (edict_t *ent)
 		return;
 	}
 	ent->client->newweapon = FindItem ("blaster");
+	*/
 }
 
 /*
