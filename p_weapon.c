@@ -786,8 +786,18 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	VectorSet(offset, 8, 8, ent->viewheight-8);
-	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+	if (ent->client->missile_fireport_leftright)
+	{
+		VectorSet(offset, 8, 16, ent->viewheight - 8);
+		P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+		ent->client->missile_fireport_leftright = false;
+	}
+	else
+	{
+		VectorSet(offset, 8, -16, ent->viewheight - 8);
+		P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+		ent->client->missile_fireport_leftright = true;
+	}
 
 	// TODO: add in left/right fire port tracking
 	fire_rocket (ent, start, forward, damage, 600, damage_radius, radius_damage);
