@@ -875,7 +875,7 @@ void Quadlaser_Fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, i
 	P_ProjectSource(ent->client, ent->s.origin, leftupoffset, forward, right, leftup);
 
 	// TODO: add quadlaser powerup and check for it
-//	if (is_quadlaser)
+	if (ent->client->is_quadlaser)
 	{
 		VectorSet(leftdownoffset, 20, 32, ent->viewheight - 20);
 		VectorAdd(leftdownoffset, g_offset, leftdownoffset);
@@ -892,7 +892,7 @@ void Quadlaser_Fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, i
 	fire_blaster(ent, leftup, forward, damage, 575, effect, hyper);
 
 	// TODO: add quadlaser powerup and check for it
-//	if (is_quadlaser)
+	if (ent->client->is_quadlaser)
 	{
 		fire_blaster(ent, leftdown, forward, damage, 575, effect, hyper);
 		fire_blaster(ent, rightdown, forward, damage, 575, effect, hyper);

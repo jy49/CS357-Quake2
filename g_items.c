@@ -417,6 +417,15 @@ void	Use_Silencer (edict_t *ent, gitem_t *item)
 //	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
 }
 
+void	Use_Quadlaser(edict_t *ent, gitem_t *item)
+{
+	ent->client->pers.inventory[ITEM_INDEX(item)]--;
+	ValidateSelectedItem(ent);
+	ent->client->is_quadlaser = true;
+
+	//	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
+}
+
 //======================================================================
 
 qboolean Pickup_Key (edict_t *ent, edict_t *other)
@@ -1707,6 +1716,28 @@ always owned, never in the world
 		0,
 /* precache */ "items/protect.wav items/protect2.wav items/protect4.wav"
 	},
+
+	{
+		"item_quadlaser",
+		Pickup_Powerup,
+		Use_Quadlaser,
+		Drop_General,
+		NULL,
+		"items/pkup.wav",
+		"models/items/invulner/tris.md2", EF_ROTATE,
+		NULL,
+		/* icon */		"p_invulnerability",
+		/* pickup */	"Quadlaser",
+		/* width */		2,
+		300,
+		NULL,
+		IT_POWERUP,
+		0,
+		NULL,
+		0,
+		/* precache */ "items/protect.wav items/protect2.wav items/protect4.wav"
+	},
+
 
 /*QUAKED item_silencer (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
