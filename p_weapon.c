@@ -930,7 +930,7 @@ void Weapon_Blaster_Fire (edict_t *ent)
 	else
 		damage = 10;
 
-	Quadlaser_Fire(ent, vec3_origin, damage, false, EF_BLASTER);
+	Spreadfire_fire(ent, vec3_origin, damage, false, EF_BLASTER);
 	
 	ent->client->ps.gunframe++;
 }
@@ -943,15 +943,70 @@ void Weapon_Blaster (edict_t *ent)
 	Weapon_Generic (ent, 4, 8, 52, 55, pause_frames, fire_frames, Weapon_Blaster_Fire);
 }
 
+Spreadfire_fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, int effect)
+{
+	vec3_t	forward, right;
+	vec3_t	leftshot, centershot, rightshot,
+			leftoffset, centeroffset, rightoffset;
+
+	
+	AngleVectors(ent->client->v_angle, forward, right, NULL);
+
+	VectorSet(centeroffset, 0, 0, ent->viewheight);
+	VectorAdd(centeroffset, g_offset, centeroffset);
+	P_ProjectSource(ent->client, ent->s.origin, centeroffset, forward, right, centershot);
+
+	if ((ent->client->ps.gunframe == 6) || (ent->client->ps.gunframe == 9))
+		effect = EF_HYPERBLASTER;
+	else
+		effect = 0;
+
+
+	if (ent->client->primary_spreadfire_updown)
+	{
+		VectorSet(leftoffset, 0, -16, ent->viewheight);
+		VectorAdd(leftoffset, g_offset, leftoffset);
+		P_ProjectSource(ent->client, ent->s.origin, leftoffset, forward, right, leftshot);
+		VectorSet(rightoffset, 0, 16, ent->viewheight);
+		VectorAdd(rightoffset, g_offset, rightoffset);
+		P_ProjectSource(ent->client, ent->s.origin, rightoffset, forward, right, rightshot);
+		ent->client->primary_spreadfire_updown = false;
+	}
+	else
+	{
+		VectorSet(leftoffset, 0, 0, ent->viewheight - 16);
+		VectorAdd(leftoffset, g_offset, leftoffset);
+		P_ProjectSource(ent->client, ent->s.origin, leftoffset, forward, right, leftshot);
+		VectorSet(rightoffset, 0, 0, ent->viewheight + 16);
+		VectorAdd(rightoffset, g_offset, rightoffset);
+		P_ProjectSource(ent->client, ent->s.origin, rightoffset, forward, right, rightshot);
+		ent->client->primary_spreadfire_updown = true;
+	}
+
+	fire_blaster(ent, leftshot, forward, damage, 725, effect, false);
+	fire_blaster(ent, centershot, forward, damage, 725, effect, false);
+	fire_blaster(ent, rightshot, forward, damage, 725, effect, false);
+}
 
 void Weapon_HyperBlaster_Fire (edict_t *ent)
 {
-	float	rotation;
-	vec3_t	offset;
-	int		effect;
-	int		damage;
+//	float	rotation;
+//	vec3_t	offset;
+
+
+	int	damage;
+	if (deathmatch->value)
+	{
+		damage = 15;
+	}
+	else
+	{
+		damage = 20;
+	}
+
 
 	ent->client->weapon_sound = gi.soundindex("weapons/hyprbl1a.wav");
+
 
 	if (!(ent->client->buttons & BUTTON_ATTACK))
 	{
@@ -970,20 +1025,15 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 		}
 		else
 		{
-			rotation = (ent->client->ps.gunframe - 5) * 2*M_PI/6;
-			offset[0] = -4 * sin(rotation);
-			offset[1] = 0;
-			offset[2] = 4 * cos(rotation);
 
-			if ((ent->client->ps.gunframe == 6) || (ent->client->ps.gunframe == 9))
-				effect = EF_HYPERBLASTER;
-			else
-				effect = 0;
-			if (deathmatch->value)
-				damage = 15;
-			else
-				damage = 20;
-			Blaster_Fire (ent, offset, damage, true, effect);
+//			rotation = (ent->client->ps.gunframe - 5) * 2*M_PI/6;
+//			offset[0] = -4 * sin(rotation);
+//			offset[1] = 0;
+//			offset[2] = 4 * cos(rotation);
+
+			
+			Quadlaser_Fire(ent, vec3_origin, damage, false, EF_BLASTER);
+
 			if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
 				ent->client->pers.inventory[ent->client->ammo_index]--;
 
