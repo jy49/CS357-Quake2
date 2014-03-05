@@ -962,7 +962,7 @@ struct gclient_s
 	qboolean	update_chase;		// need to update chase info?
 
 	qboolean	is_quadlaser;
-	qboolean	missile_fireport_leftright;
+	qboolean	secondary_fireport_leftright;
 };
 
 
