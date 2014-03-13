@@ -649,6 +649,135 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	gi.linkentity (rocket);
 }
 
+// Code borrowed from:
+// http://webadvisor.aupr.edu/noc/Othertutorials%5Cqdevels%5C-%20Homing%20missile%20.html
+
+// CCH: New think function for homing missiles
+void homing_think(edict_t *ent)
+{
+	edict_t *target = NULL;
+	edict_t *blip = NULL;
+	vec3_t  targetdir, blipdir;
+	vec_t   speed;
+	// TODO: Turn rate is approx what is in descent
+	//       but cannot double back if it has enough fuel left
+	float	turn_rate = 0.5;
+
+	
+	while ((blip = findradius(blip, ent->s.origin, 1000)) != NULL)
+	{
+
+		if (!(blip->svflags & SVF_MONSTER) && !blip->client)
+			continue;
+
+		if (blip == ent->owner)
+			continue;
+
+		if (!blip->takedamage)
+			continue;
+
+		if (blip->health <= 0)
+			continue;
+
+		if (!visible(ent, blip))
+			continue;
+
+		if (!infront(ent, blip))
+			continue;
+
+		VectorSubtract(blip->s.origin, ent->s.origin, blipdir);
+
+		blipdir[2] += 16;
+
+		if ((target == NULL) || (VectorLength(blipdir) < VectorLength(targetdir)))
+		{
+			target = blip;
+			VectorCopy(blipdir, targetdir);
+		}
+	}
+
+
+	if (target != NULL)
+	{
+		// target acquired, nudge our direction toward it
+		VectorNormalize(targetdir);
+		VectorScale(targetdir, turn_rate, targetdir);
+		VectorAdd(targetdir, ent->movedir, targetdir);
+		VectorNormalize(targetdir);
+		VectorCopy(targetdir, ent->movedir);
+		vectoangles(targetdir, ent->s.angles);
+		speed = VectorLength(ent->velocity);
+		VectorScale(targetdir, speed, ent->velocity);
+	}
+
+	ent->nextthink = level.time + .1;
+}
+
+void fire_homing_missile(edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage)
+{
+	edict_t	*rocket;
+
+	rocket = G_Spawn();
+	VectorCopy(start, rocket->s.origin);
+	VectorCopy(dir, rocket->movedir);
+	vectoangles(dir, rocket->s.angles);
+	VectorScale(dir, speed, rocket->velocity);
+	rocket->movetype = MOVETYPE_FLYMISSILE;
+	rocket->clipmask = MASK_SHOT;
+	rocket->solid = SOLID_BBOX;
+	rocket->s.effects |= EF_ROCKET;
+	VectorClear(rocket->mins);
+	VectorClear(rocket->maxs);
+	rocket->s.modelindex = gi.modelindex("models/objects/rocket/tris.md2");
+	rocket->owner = self;
+	rocket->touch = rocket_touch;
+//	rocket->nextthink = level.time + 8000 / speed;
+//	rocket->think = G_FreeEdict;
+
+	// Code borrowed from:
+	// http://webadvisor.aupr.edu/noc/Othertutorials%5Cqdevels%5C-%20Homing%20missile%20.html
+
+	// CCH: see if this is a player and if they have homing on
+
+	// Disable homing state check, this function is only for homing missiles
+//	if (self->client && self->client->pers.homing_state)	
+	if (self->client)
+	{
+		// Also disable having each shot eat multiple rounds
+		// CCH: if they have 5 cells, start homing, otherwise normal rocket think
+//		if (self->client->pers.inventory[ITEM_INDEX(FindItem("Cells"))] >= 5)
+		{
+//			self->client->pers.inventory[ITEM_INDEX(FindItem("Cells"))] -= 5;
+			rocket->nextthink = level.time + .1;
+			rocket->think = homing_think;
+
+		}
+//		else
+//		{
+//			gi.cprintf(self, PRINT_HIGH, "No cells for homing missile.\n");
+//			rocket->nextthink = level.time + 8000 / speed;
+//			rocket->think = G_FreeEdict;
+//		}
+	}
+	else
+	{
+
+		rocket->nextthink = level.time + 8000 / speed;
+		rocket->think = G_FreeEdict;
+
+	}
+	rocket->dmg = damage;
+	rocket->radius_dmg = radius_damage;
+	rocket->dmg_radius = damage_radius;
+	rocket->s.sound = gi.soundindex("weapons/rockfly.wav");
+	rocket->classname = "rocket";
+
+	if (self->client)
+		check_dodge(self, rocket->s.origin, dir, speed);
+
+	gi.linkentity(rocket);
+}
+
 
 /*
 =================

@@ -823,6 +823,66 @@ void Weapon_RocketLauncher (edict_t *ent)
 	Weapon_Generic (ent, 4, 12, 50, 54, pause_frames, fire_frames, Weapon_RocketLauncher_Fire);
 }
 
+void Weapon_Homing_Missile_Fire(edict_t *ent)
+{
+	vec3_t	offset, start;
+	vec3_t	forward, right;
+	int		damage;
+	float	damage_radius;
+	int		radius_damage;
+
+	// TODO: damage numbers/splash damage range likely dont match real ones
+	damage = 35;
+	radius_damage = 25;
+	damage_radius = 120;
+	if (is_quad)
+	{
+		damage *= 4;
+		radius_damage *= 4;
+	}
+
+	AngleVectors(ent->client->v_angle, forward, right, NULL);
+
+	VectorScale(forward, -2, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -1;
+
+	if (ent->client->secondary_fireport_leftright)
+	{
+		VectorSet(offset, 8, 16, ent->viewheight - 8);
+		P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+		ent->client->secondary_fireport_leftright = false;
+	}
+	else
+	{
+		VectorSet(offset, 8, -16, ent->viewheight - 8);
+		P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+		ent->client->secondary_fireport_leftright = true;
+	}
+
+	fire_homing_missile(ent, start, forward, damage, 600, damage_radius, radius_damage);
+
+	// send muzzle flash
+	gi.WriteByte(svc_muzzleflash);
+	gi.WriteShort(ent - g_edicts);
+	gi.WriteByte(MZ_ROCKET | is_silenced);
+	gi.multicast(ent->s.origin, MULTICAST_PVS);
+
+	ent->client->ps.gunframe++;
+
+	PlayerNoise(ent, start, PNOISE_WEAPON);
+
+	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+		ent->client->pers.inventory[ent->client->ammo_index]--;
+}
+
+
+void Weapon_Homing_Missile(edict_t *ent)
+{
+	static int	pause_frames[] = { 25, 33, 42, 50, 0 };
+	static int	fire_frames[] = { 5, 0 };
+
+	Weapon_Generic(ent, 4, 12, 50, 54, pause_frames, fire_frames, Weapon_Homing_Missile_Fire);
+}
 
 /*
 ======================================================================
