@@ -961,6 +961,9 @@ struct gclient_s
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
 
+	qboolean	flyup;
+	qboolean	flydown;
+
 	qboolean	powerup_quadlaser;
 //	TODO: Implement ammo rack
 //	qboolean	powerup_ammorack;

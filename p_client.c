@@ -1569,6 +1569,31 @@ void PrintPmove (pmove_t *pm)
 	Com_Printf ("sv %3i:%i %i\n", pm->cmd.impulse, c1, c2);
 }
 
+// FIXME: is this the right place for a function like this?
+void Strafe(edict_t *ent, int direction)
+{
+	// FIXME: This should be defined better, but it's a hack
+	const int up = 1;
+	const int down = -1;
+	const int stop = 0;
+
+	// FIXME: 
+	if (direction == up)
+	{
+		ent->velocity[2] = 300;
+	}
+	else if (direction == down)
+	{
+		ent->velocity[2] = -300;
+	}
+	else if (direction == stop)
+	{
+		ent->velocity[2] = 0;
+	}
+
+	
+}
+
 /*
 ==============
 ClientThink
@@ -1597,6 +1622,16 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		return;
 	}
 
+	// Thrust directions
+	if (ent->client->flyup)
+		Strafe(ent, 1);
+	if (ent->client->flydown)
+		Strafe(ent, -1);
+	if (!(ent->client->flydown) && !(ent->client->flyup))
+	{
+		Strafe(ent, 0);
+	}
+
 	pm_passent = ent;
 
 	if (ent->client->chase_target) {
@@ -1619,7 +1654,8 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		else
 			client->ps.pmove.pm_type = PM_NORMAL;
 
-		client->ps.pmove.gravity = sv_gravity->value;
+		// HACK: sets sv_gravity = 0 for players for flying
+		client->ps.pmove.gravity = 0;
 		pm.s = client->ps.pmove;
 
 		for (i=0 ; i<3 ; i++)
