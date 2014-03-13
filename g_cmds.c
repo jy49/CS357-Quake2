@@ -899,26 +899,65 @@ void Cmd_PlayerList_f(edict_t *ent)
 	gi.cprintf(ent, PRINT_HIGH, "%s", text);
 }
 
-// TODO: add up motion
-void Cmd_strafe_f(edict_t *ent)
+/* FIXME: Reenable when forwards/backwards strafing works
+void Cmd_strafex_f(edict_t *ent)
 {
-	char    *string;
-	string = gi.args();
+char    *direction;
+direction = gi.args();
 
-	if (Q_stricmp(string, "up") == 0 && ent->client->flydown != 1)
+	if (Q_stricmp(direction, "forward") == 0)
 	{
-		ent->client->flyup = 1;
+		ent->client->strafeforwardbackward = 1;
 	}
-	else if (Q_stricmp(string, "down") == 0 && ent->client->flyup != 1)
+	else if (Q_stricmp(direction, "backward") == 0)
 	{
-		ent->client->flydown = 1;
+		ent->client->strafeforwardbackward = -1;
 	}
 	else
 	{
-		ent->client->flyup = 0;
-		ent->client->flydown = 0;
+		ent->client->strafeforwardbackward = 0;
 	}
 }
+*/
+
+void Cmd_strafey_f(edict_t *ent)
+{
+	char    *direction;
+	direction = gi.args();
+
+	if (Q_stricmp(direction, "up") == 0)
+	{
+		ent->client->strafeupdown = 1;
+	}
+	else if (Q_stricmp(direction, "down") == 0)
+	{
+		ent->client->strafeupdown = -1;
+	}
+	else
+	{
+		ent->client->strafeupdown = 0;
+	}
+}
+
+/* FIXME: Reenable when left/right strafing works
+void Cmd_strafez_f(edict_t *ent)
+{
+	char    *direction;
+	direction = gi.args();
+
+	if (Q_stricmp(direction, "left") == 0)
+	{
+		ent->client->strafeleftright = 1;
+	}
+	else if (Q_stricmp(direction, "right") == 0)
+	{
+		ent->client->strafeleftright = -1;
+	}
+	else
+	{
+		ent->client->strafeleftright = 0;
+	}
+} */
 
 /*
 =================
@@ -965,8 +1004,12 @@ void ClientCommand (edict_t *ent)
 
 	if (Q_stricmp(cmd, "use") == 0)
 		Cmd_Use_f(ent);
-	else if (Q_stricmp(cmd, "strafe") == 0)
-		Cmd_strafe_f(ent);
+//	else if (Q_stricmp(cmd, "strafex") == 0)
+//		Cmd_strafex_f(ent);
+	else if (Q_stricmp(cmd, "strafey") == 0)
+		Cmd_strafey_f(ent);
+//	else if (Q_stricmp(cmd, "strafez") == 0)
+//		Cmd_strafez_f(ent);
 	else if (Q_stricmp (cmd, "drop") == 0)
 		Cmd_Drop_f (ent);
 	else if (Q_stricmp (cmd, "give") == 0)

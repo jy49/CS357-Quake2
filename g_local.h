@@ -961,8 +961,13 @@ struct gclient_s
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
 
-	qboolean	flyup;
-	qboolean	flydown;
+
+	// First part of name = 1 
+	// Second part of name = -1
+	// No movement on that axis = 0
+	int	strafeupdown;
+	int	strafeforwardbackward;
+	int	strafeleftright;
 
 	qboolean	powerup_quadlaser;
 //	TODO: Implement ammo rack

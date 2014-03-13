@@ -20,6 +20,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 #include "m_player.h"
 
+// FIXME: This should be defined better, but it's a hack
+//#define STRAFE_FORWARD 1
+//#define STRAFE_BACKWARD -1
+//#define STRAFE_LEFT -1
+//#define STRAFE_RIGHT -1
+#define STRAFE_UP 1
+#define STRAFE_DOWN -1
+#define STRAFE_STOP 0
+
 void ClientUserinfoChanged (edict_t *ent, char *userinfo);
 
 void SP_misc_teleporter_dest (edict_t *ent);
@@ -1569,30 +1578,56 @@ void PrintPmove (pmove_t *pm)
 	Com_Printf ("sv %3i:%i %i\n", pm->cmd.impulse, c1, c2);
 }
 
-// FIXME: is this the right place for a function like this?
-void Strafe(edict_t *ent, int direction)
+// FIXME: is this the right place for these functions?
+/* FIXME: Compensate for direction player is facing
+void Strafe_X(edict_t *ent, int direction)
 {
-	// FIXME: This should be defined better, but it's a hack
-	const int up = 1;
-	const int down = -1;
-	const int stop = 0;
+	if (direction == STRAFE_FORWARD)
+	{
+		ent->velocity[0] = 300;
+	}
+	else if (direction == STRAFE_BACKWARD)
+	{
+		ent->velocity[0] = -300;
+	}
+	else if (direction == STRAFE_STOP)
+	{
+		ent->velocity[0] = 0;
+	}
+} */
 
-	// FIXME: 
-	if (direction == up)
+void Strafe_Y(edict_t *ent, int direction)
+{
+	if (direction == STRAFE_UP)
 	{
 		ent->velocity[2] = 300;
 	}
-	else if (direction == down)
+	else if (direction == STRAFE_DOWN)
 	{
 		ent->velocity[2] = -300;
 	}
-	else if (direction == stop)
+	else if (direction == STRAFE_STOP)
 	{
 		ent->velocity[2] = 0;
-	}
-
-	
+	}	
 }
+
+/* FIXME: Compensate for direction player is facing
+void Strafe_Z(edict_t *ent, int direction)
+{
+	if (direction == STRAFE_LEFT)
+	{
+		ent->velocity[0] = 300;
+	}
+	else if (direction == STRAFE_RIGHT)
+	{
+		ent->velocity[0] = -300;
+	}
+	else if (direction == STRAFE_STOP)
+	{
+		ent->velocity[0] = 0;
+	}
+} */
 
 /*
 ==============
@@ -1622,15 +1657,9 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		return;
 	}
 
-	// Thrust directions
-	if (ent->client->flyup)
-		Strafe(ent, 1);
-	if (ent->client->flydown)
-		Strafe(ent, -1);
-	if (!(ent->client->flydown) && !(ent->client->flyup))
-	{
-		Strafe(ent, 0);
-	}
+//	Strafe_X(ent, ent->client->strafeforwardbackward);
+	Strafe_Y(ent, ent->client->strafeupdown);
+//	Strafe_Z(ent, ent->client->strafeleftright);
 
 	pm_passent = ent;
 
