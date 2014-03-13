@@ -421,7 +421,7 @@ void	Use_Quadlaser(edict_t *ent, gitem_t *item)
 {
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem(ent);
-	ent->client->is_quadlaser = true;
+	ent->client->powerup_quadlaser = true;
 
 	//	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
 }

@@ -961,8 +961,24 @@ struct gclient_s
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
 
-	qboolean	is_quadlaser;
+	qboolean	powerup_quadlaser;
+//	TODO: Implement ammo rack
+//	qboolean	powerup_ammorack;
+//	TODO: Implement headlamp
+//	qboolean	powerup_headlamp;
+//	TODO: Implement Energy to shield converter
+//	qboolean	powerup_energytoshield;
+//	TODO: Implement afterburner
+//	qboolean	powerup_afterburner;
+
+//	TODO: Implement laser leveling
+//	int			primary_laser_level;
 	qboolean    primary_spreadfire_updown;
+//	TODO: Implement helix cannon
+//	int			primary_helix_rotation;
+//	TODO: Implement Fusion cannon
+//	float		primary_fusioncannon_charge;
+
 	qboolean	secondary_fireport_leftright;
 };
 
