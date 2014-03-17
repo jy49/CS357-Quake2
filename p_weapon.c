@@ -763,29 +763,22 @@ ROCKET
 ======================================================================
 */
 
+// TODO: Rename to Concussion missile
 void Weapon_RocketLauncher_Fire (edict_t *ent)
 {
 	vec3_t	offset, start;
 	vec3_t	forward, right;
-	int		damage;
-	float	damage_radius;
-	int		radius_damage;
-
 	// TODO: damage numbers/splash damage range likely dont match real ones
-	damage = 35;
-	radius_damage = 25;
-	damage_radius = 120;
-	if (is_quad)
-	{
-		damage *= 4;
-		radius_damage *= 4;
-	}
+	int		damage = 35;
+	float	damage_radius = 25;
+	int		radius_damage = 120;
+	int		speed = 600;
 
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
-
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
+	// TODO: make seperate function to handle fireports
 	if (ent->client->secondary_fireport_leftright)
 	{
 		VectorSet(offset, 8, 16, ent->viewheight - 8);
@@ -798,17 +791,9 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 		P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
 		ent->client->secondary_fireport_leftright = true;
 	}
-
-	fire_rocket (ent, start, forward, damage, 600, damage_radius, radius_damage);
-
-	// send muzzle flash
-	gi.WriteByte (svc_muzzleflash);
-	gi.WriteShort (ent-g_edicts);
-	gi.WriteByte (MZ_ROCKET | is_silenced);
-	gi.multicast (ent->s.origin, MULTICAST_PVS);
+	fire_rocket (ent, start, forward, damage, speed, damage_radius, radius_damage);
 
 	ent->client->ps.gunframe++;
-
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
@@ -827,25 +812,17 @@ void Weapon_Homing_Missile_Fire(edict_t *ent)
 {
 	vec3_t	offset, start;
 	vec3_t	forward, right;
-	int		damage;
-	float	damage_radius;
-	int		radius_damage;
-
 	// TODO: damage numbers/splash damage range likely dont match real ones
-	damage = 35;
-	radius_damage = 25;
-	damage_radius = 120;
-	if (is_quad)
-	{
-		damage *= 4;
-		radius_damage *= 4;
-	}
+	int		damage = 35;
+	float	damage_radius = 25;
+	int		radius_damage = 120;
+	int		speed = 600;
 
 	AngleVectors(ent->client->v_angle, forward, right, NULL);
-
 	VectorScale(forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
+	// TODO: make seperate function to handle fireports
 	if (ent->client->secondary_fireport_leftright)
 	{
 		VectorSet(offset, 8, 16, ent->viewheight - 8);
@@ -858,17 +835,9 @@ void Weapon_Homing_Missile_Fire(edict_t *ent)
 		P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
 		ent->client->secondary_fireport_leftright = true;
 	}
-
-	fire_homing_missile(ent, start, forward, damage, 600, damage_radius, radius_damage);
-
-	// send muzzle flash
-	gi.WriteByte(svc_muzzleflash);
-	gi.WriteShort(ent - g_edicts);
-	gi.WriteByte(MZ_ROCKET | is_silenced);
-	gi.multicast(ent->s.origin, MULTICAST_PVS);
+	fire_homing_missile(ent, start, forward, damage, speed, damage_radius, radius_damage);
 
 	ent->client->ps.gunframe++;
-
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (!((int)dmflags->value & DF_INFINITE_AMMO))
@@ -969,11 +938,8 @@ void Quadlaser_Fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, i
 	vec3_t  leftup, leftupoffset,
 			leftdown, leftdownoffset,
 			rightdown, rightdownoffset;
+	int		speed = 575;
 
-	if (is_quad)
-	{
-		damage *= 4;
-	}
 	AngleVectors(ent->client->v_angle, forward, right, NULL);
 	VectorSet(offset, 20, 16, ent->viewheight - 8);
 	VectorAdd(offset, g_offset, offset);
@@ -982,6 +948,7 @@ void Quadlaser_Fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, i
 	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
 	P_ProjectSource(ent->client, ent->s.origin, leftupoffset, forward, right, leftup);
 
+	// Be lazy: only calculate positions of lower fire ports if they're actually used
 	if (ent->client->powerup_quadlaser)
 	{
 		VectorSet(leftdownoffset, 20, 32, ent->viewheight - 20);
@@ -995,27 +962,22 @@ void Quadlaser_Fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, i
 	VectorScale(forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_blaster(ent,  start, forward, damage, 575, effect, hyper);
-	fire_blaster(ent, leftup, forward, damage, 575, effect, hyper);
+	// These are the upper left and right fireports
+	fire_blaster(ent,  start, forward, damage, speed, effect, hyper);
+	fire_blaster(ent, leftup, forward, damage, speed, effect, hyper);
 
+	// These are the lower left and right fireports,
+	// only used if player has a quadlaser
 	if (ent->client->powerup_quadlaser)
 	{
-		fire_blaster(ent, leftdown, forward, damage, 575, effect, hyper);
-		fire_blaster(ent, rightdown, forward, damage, 575, effect, hyper);
+		fire_blaster(ent, leftdown, forward, damage, speed, effect, hyper);
+		fire_blaster(ent, rightdown, forward, damage, speed, effect, hyper);
 	}
-	// send muzzle flash
-	gi.WriteByte(svc_muzzleflash);
-	gi.WriteShort(ent - g_edicts);
-	if (hyper)
-		gi.WriteByte(MZ_HYPERBLASTER | is_silenced);
-	else
-		gi.WriteByte(MZ_BLASTER | is_silenced);
-	gi.multicast(ent->s.origin, MULTICAST_PVS);
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 }
 
-
+// TODO: Rename weapon to spreadfire
 void Weapon_Blaster_Fire (edict_t *ent)
 {
 	int		damage;
@@ -1044,8 +1006,8 @@ Spreadfire_fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, int e
 	vec3_t	forward, right;
 	vec3_t	leftshot, centershot, rightshot,
 			leftoffset, centeroffset, rightoffset;
+	int		speed = 575;
 
-	
 	AngleVectors(ent->client->v_angle, forward, right, NULL);
 
 	VectorSet(centeroffset, 0, 0, ent->viewheight);
@@ -1057,7 +1019,7 @@ Spreadfire_fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, int e
 	else
 		effect = 0;
 
-
+	// Left/right represents Left/right and Up/down, alternating between shots
 	if (ent->client->primary_spreadfire_updown)
 	{
 		VectorSet(leftoffset, 0, -16, ent->viewheight);
@@ -1079,18 +1041,16 @@ Spreadfire_fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, int e
 		ent->client->primary_spreadfire_updown = true;
 	}
 
-	fire_blaster(ent, leftshot, forward, damage, 725, effect, false);
-	fire_blaster(ent, centershot, forward, damage, 725, effect, false);
-	fire_blaster(ent, rightshot, forward, damage, 725, effect, false);
+	fire_blaster(ent, leftshot, forward, damage, speed, effect, false);
+	fire_blaster(ent, centershot, forward, damage, speed, effect, false);
+	fire_blaster(ent, rightshot, forward, damage, speed, effect, false);
 }
 
+// TODO: Rename to Quad/Laser
 void Weapon_HyperBlaster_Fire (edict_t *ent)
 {
-//	float	rotation;
-//	vec3_t	offset;
-
-
 	int	damage;
+	// TODO: Change this to work with laser leveling
 	if (deathmatch->value)
 	{
 		damage = 15;
@@ -1102,7 +1062,6 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 
 
 	ent->client->weapon_sound = gi.soundindex("weapons/hyprbl1a.wav");
-
 
 	if (!(ent->client->buttons & BUTTON_ATTACK))
 	{
@@ -1120,14 +1079,7 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 			NoAmmoWeaponChange (ent);
 		}
 		else
-		{
-
-//			rotation = (ent->client->ps.gunframe - 5) * 2*M_PI/6;
-//			offset[0] = -4 * sin(rotation);
-//			offset[1] = 0;
-//			offset[2] = 4 * cos(rotation);
-
-			
+		{			
 			Quadlaser_Fire(ent, vec3_origin, damage, false, EF_BLASTER);
 
 			if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
@@ -1186,11 +1138,10 @@ void Machinegun_Fire (edict_t *ent)
 	int			damage = 8;
 	int			kick = 0;	// Descent weapons have no kick
 	vec3_t		offset;
-	qboolean	hyper = false;
-	int			effect = EF_BLASTER;
 	vec3_t		leftup, leftoffset,
 				rightup, rightoffset;
 	vec3_t		g_offset;
+	int			speed = 1000;
 
 	if (!(ent->client->buttons & BUTTON_ATTACK))
 	{
@@ -1222,26 +1173,6 @@ void Machinegun_Fire (edict_t *ent)
 		kick *= 4;
 	}
 
-	/*
-	for (i=1 ; i<3 ; i++)
-	{
-		ent->client->kick_origin[i] = crandom() * 0.35;
-		ent->client->kick_angles[i] = crandom() * 0.7;
-	}
-	ent->client->kick_origin[0] = crandom() * 0.35;
-	ent->client->kick_angles[0] = ent->client->machinegun_shots * -1.5;
-	*/
-
-	/*
-	// raise the gun as it is firing
-	if (!deathmatch->value)
-	{
-		ent->client->machinegun_shots++;
-		if (ent->client->machinegun_shots > 9)
-			ent->client->machinegun_shots = 9;
-	}
-	*/
-
 	// get start / end positions
 	VectorAdd (ent->client->v_angle, ent->client->kick_angles, angles);
 	AngleVectors (angles, forward, right, NULL);
@@ -1255,18 +1186,9 @@ void Machinegun_Fire (edict_t *ent)
 	P_ProjectSource(ent->client, ent->s.origin, leftoffset, forward, right, leftup);
 	P_ProjectSource(ent->client, ent->s.origin, rightoffset, forward, right, rightup);
 
+	fire_blaster(ent, leftup, forward, damage, speed, EF_BLASTER, false);
+	fire_blaster(ent, rightup, forward, damage, speed, EF_BLASTER, false);
 
-//	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-//	fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
-
-	fire_blaster(ent, leftup, forward, damage, 1000, effect, hyper);
-	fire_blaster(ent, rightup, forward, damage, 1000, effect, hyper);
-
-
-	gi.WriteByte (svc_muzzleflash);
-	gi.WriteShort (ent-g_edicts);
-	gi.WriteByte (MZ_MACHINEGUN | is_silenced);
-	gi.multicast (ent->s.origin, MULTICAST_PVS);
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
@@ -1382,18 +1304,6 @@ void Chaingun_Fire (edict_t *ent)
 		return;
 	}
 
-	if (is_quad)
-	{
-		damage *= 4;
-		kick *= 4;
-	}
-
-//	for (i=0 ; i<3 ; i++)
-//	{
-//		ent->client->kick_origin[i] = crandom() * 0.35;
-//		ent->client->kick_angles[i] = crandom() * 0.7;
-//	}
-
 	for (i=0 ; i<shots ; i++)
 	{
 		// get start / end positions
@@ -1405,12 +1315,6 @@ void Chaingun_Fire (edict_t *ent)
 
 		fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_CHAINGUN);
 	}
-
-	// send muzzle flash
-	gi.WriteByte (svc_muzzleflash);
-	gi.WriteShort (ent-g_edicts);
-	gi.WriteByte ((MZ_CHAINGUN1 + shots - 1) | is_silenced);
-	gi.multicast (ent->s.origin, MULTICAST_PVS);
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
