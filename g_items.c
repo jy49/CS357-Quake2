@@ -37,6 +37,7 @@ void Weapon_Railgun (edict_t *ent);
 void Weapon_BFG (edict_t *ent);
 
 void Weapon_Homing_Missile(edict_t *ent);
+void Weapon_Mega_Missile(edict_t *ent);
 
 gitem_armor_t jacketarmor_info	= { 25,  50, .30, .00, ARMOR_JACKET};
 gitem_armor_t combatarmor_info	= { 50, 100, .60, .30, ARMOR_COMBAT};
@@ -1494,6 +1495,29 @@ always owned, never in the world
 	"models/weapons/v_rocket/tris.md2",
 	/* icon */		"w_rlauncher",
 	/* pickup */	"Homing Missile",
+	0,
+	1,
+	"Rockets",
+	IT_WEAPON | IT_STAY_COOP,
+	WEAP_ROCKETLAUNCHER,
+	NULL,
+	0,
+	/* precache */ "models/objects/rocket/tris.md2 weapons/rockfly.wav weapons/rocklf1a.wav weapons/rocklr1b.wav models/objects/debris2/tris.md2"
+},
+
+/*QUAKED weapon_rocketlauncher (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+{
+	"weapon_mega_missile",
+	Pickup_Weapon,
+	Use_Weapon,
+	Drop_Weapon,
+	Weapon_Mega_Missile,
+	"misc/w_pkup.wav",
+	"models/weapons/g_rocket/tris.md2", EF_ROTATE,
+	"models/weapons/v_rocket/tris.md2",
+	/* icon */		"w_rlauncher",
+	/* pickup */	"Mega Missile",
 	0,
 	1,
 	"Rockets",

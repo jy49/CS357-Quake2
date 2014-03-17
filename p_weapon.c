@@ -884,6 +884,45 @@ void Weapon_Homing_Missile(edict_t *ent)
 	Weapon_Generic(ent, 4, 12, 50, 54, pause_frames, fire_frames, Weapon_Homing_Missile_Fire);
 }
 
+void Weapon_Mega_Missile_Fire(edict_t *ent)
+{
+	vec3_t	offset, start;
+	vec3_t	forward, right;
+	// TODO: numbers might not be very accurate
+	int		damage = 300;
+	float	damage_radius = 125;
+	int		radius_damage = 225;
+	int		speed = 475;
+
+
+	AngleVectors(ent->client->v_angle, forward, right, NULL);
+
+	VectorScale(forward, -2, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -1;
+
+	// Fires from center port
+	VectorSet(offset, 8, 0, ent->viewheight - 8);
+	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+	
+	fire_homing_missile(ent, start, forward, damage, speed, damage_radius, radius_damage);
+
+	ent->client->ps.gunframe++;
+
+	PlayerNoise(ent, start, PNOISE_WEAPON);
+
+	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+		ent->client->pers.inventory[ent->client->ammo_index]--;
+}
+
+
+void Weapon_Mega_Missile(edict_t *ent)
+{
+	static int	pause_frames[] = { 25, 33, 42, 50, 0 };
+	static int	fire_frames[] = { 5, 0 };
+
+	Weapon_Generic(ent, 4, 12, 50, 54, pause_frames, fire_frames, Weapon_Homing_Missile_Fire);
+}
+
 /*
 ======================================================================
 

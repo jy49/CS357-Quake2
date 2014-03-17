@@ -652,6 +652,11 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 // Code borrowed from:
 // http://webadvisor.aupr.edu/noc/Othertutorials%5Cqdevels%5C-%20Homing%20missile%20.html
 
+// FIXME: Does a think function belon in g_weapon?
+
+// All the real logic of the homing missile is in homing_think
+// As this is borrowed code, it will be documented throughly
+
 // CCH: New think function for homing missiles
 void homing_think(edict_t *ent)
 {
@@ -659,49 +664,62 @@ void homing_think(edict_t *ent)
 	edict_t *blip = NULL;
 	vec3_t  targetdir, blipdir;
 	vec_t   speed;
-	// TODO: Turn rate is approx what is in descent
-	//       but cannot double back if it has enough fuel left
-	float	turn_rate = 0.5;
+	// Turn rate is approx what is in descent
+	// Turn radius is approx what is in descent, excessively tight radii might bog down server
+	float	turn_radius = 0.5;
+	float	turn_rate = 0.05;
+	int		view_cone = 1000;
 
-	
-	while ((blip = findradius(blip, ent->s.origin, 1000)) != NULL)
+	// Finds a target in front of the missile in a view cone of view_cone
+	while ((blip = findradius(blip, ent->s.origin, view_cone)) != NULL)
 	{
-
+		// Ignore anything except monster entities or players
 		if (!(blip->svflags & SVF_MONSTER) && !blip->client)
+		{
 			continue;
+		}
 
-		if (blip == ent->owner)
+		// Condensed version of original code
+		if (
+			// DON'T ignore invul targets
+			// Descent missiles will still target invul ents
+			// and simply not do damage, but splash could still hypothetically hurt others around it
+			// Less relevent for small splashing missiles like the homing missile
+			// More relevent to earthshaker bomblets
+//			(!blip->takedamage) ||
+			(blip == ent->owner) ||
+			// Ignore things that are already dead/dying/havnt despawned yet
+			(blip->health <= 0) ||
+			// Ignore invisible targets, it shouldn't home in on it
+			(!visible(ent, blip)) ||
+			// Technically does not only check what's in front
+			// Toss out values if they are simply not in front of the missile
+			(!infront(ent, blip))
+			)
+		{
 			continue;
-
-		if (!blip->takedamage)
-			continue;
-
-		if (blip->health <= 0)
-			continue;
-
-		if (!visible(ent, blip))
-			continue;
-
-		if (!infront(ent, blip))
-			continue;
+		}
 
 		VectorSubtract(blip->s.origin, ent->s.origin, blipdir);
 
 		blipdir[2] += 16;
 
+		// After all the checks, at this point the ent must be a valid taeget
 		if ((target == NULL) || (VectorLength(blipdir) < VectorLength(targetdir)))
 		{
+			// assign the target
 			target = blip;
 			VectorCopy(blipdir, targetdir);
 		}
 	}
 
-
+	// Do one final check, in the event the target disappears/despawns
+	// between target aquisition and direction change on the missile
 	if (target != NULL)
 	{
 		// target acquired, nudge our direction toward it
 		VectorNormalize(targetdir);
-		VectorScale(targetdir, turn_rate, targetdir);
+		VectorScale(targetdir, turn_radius, targetdir);
 		VectorAdd(targetdir, ent->movedir, targetdir);
 		VectorNormalize(targetdir);
 		VectorCopy(targetdir, ent->movedir);
@@ -710,7 +728,7 @@ void homing_think(edict_t *ent)
 		VectorScale(targetdir, speed, ent->velocity);
 	}
 
-	ent->nextthink = level.time + .1;
+	ent->nextthink = level.time + turn_rate;
 }
 
 void fire_homing_missile(edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage)
