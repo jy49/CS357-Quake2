@@ -626,14 +626,25 @@ void InitClientPersistant (gclient_t *client)
 	client->pers.weapon = item;
 
 	client->pers.health			= 100;
-	client->pers.max_health		= 100;
+	// TODO: Implement descent style overhealth
+	// Start with 100, can add up to 200
+	// Anything over 100 does not decay like with megahealth
+	client->pers.max_health		= 200;
 
-	client->pers.max_bullets	= 200;
-	client->pers.max_shells		= 100;
-	client->pers.max_rockets	= 50;
-	client->pers.max_grenades	= 50;
-	client->pers.max_cells		= 200;
-	client->pers.max_slugs		= 50;
+	// Give the spawning player half the maximum amount of energy
+	// Equiv to 100/200 energy
+	client->pers.inventory[ITEM_INDEX(FindItem("Shells"))] = 500;
+	// TODO: Vulcan ammo should be 1000(?)
+	// should also use multiple rounds per shot
+	client->pers.max_bullets	= 200;	// Vulcan ammo
+	// TODO: Energy is actually a floating point number in Descent
+	// Lower consumption weapons use less then 1.0 per shot
+	client->pers.max_shells		= 1000;	// Energy
+	client->pers.max_rockets	= 20;	// Concussion Missiles
+	client->pers.max_grenades	= 10;	// Mines
+	client->pers.max_cells		= 5;	// Mega Missile
+	client->pers.max_slugs		= 10;	// Homing Missile
+	client->pers.max_secondary_smart_missile = 5;	// Smart Missile
 
 	client->pers.connected = true;
 }

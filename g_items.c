@@ -227,14 +227,19 @@ qboolean Pickup_Bandolier (edict_t *ent, edict_t *other)
 	gitem_t	*item;
 	int		index;
 
-	if (other->client->pers.max_bullets < 250)
-		other->client->pers.max_bullets = 250;
-	if (other->client->pers.max_shells < 150)
-		other->client->pers.max_shells = 150;
-	if (other->client->pers.max_cells < 250)
-		other->client->pers.max_cells = 250;
-	if (other->client->pers.max_slugs < 75)
-		other->client->pers.max_slugs = 75;
+	// TODO: should simply double the current maximum
+	// Need to make it so additional ammo racks cannot be picked up first
+//	if (other->client->pers.max_bullets < 250)
+		other->client->pers.max_bullets = 400;
+//	if (other->client->pers.max_shells < 150)
+//		other->client->pers.max_shells = 150;
+//	if (other->client->pers.max_cells < 250)
+		other->client->pers.max_cells = 10;
+//	if (other->client->pers.max_slugs < 75)
+		other->client->pers.max_slugs = 20;
+		other->client->pers.max_rockets = 40;
+		other->client->pers.max_grenades = 20;
+		other->client->pers.max_secondary_smart_missile = 10;
 
 	/* Ammo rack doesn't give any extra ammo unlike the bandolier
 	item = FindItem("Bullets");
@@ -264,6 +269,7 @@ qboolean Pickup_Bandolier (edict_t *ent, edict_t *other)
 
 qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 {
+/*	Disable Pickup pack, does not exist in descent
 	gitem_t	*item;
 	int		index;
 
@@ -333,6 +339,7 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 		if (other->client->pers.inventory[index] > other->client->pers.max_slugs)
 			other->client->pers.inventory[index] = other->client->pers.max_slugs;
 	}
+*/
 
 	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
 		SetRespawn (ent, ent->item->quantity);
@@ -479,6 +486,8 @@ qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count)
 		max = ent->client->pers.max_cells;
 	else if (item->tag == AMMO_SLUGS)
 		max = ent->client->pers.max_slugs;
+	else if (item->tag == AMMO_SECONDARY_SMART_MISSILE)
+		max = ent->client->pers.max_secondary_smart_missile;
 	else
 		return false;
 
@@ -1316,7 +1325,7 @@ always owned, never in the world
 /* pickup */	"Blaster",
 		0,
 		0,
-		NULL,
+		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_BLASTER,
 		NULL,
@@ -1385,7 +1394,7 @@ always owned, never in the world
 /* pickup */	"Machinegun",
 		0,
 		1,
-		"Bullets",
+		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_MACHINEGUN,
 		NULL,
@@ -1523,7 +1532,7 @@ always owned, never in the world
 	/* pickup */	"Mega Missile",
 	0,
 	1,
-	"Rockets",
+	"Cells",
 	IT_WEAPON | IT_STAY_COOP,
 	WEAP_ROCKETLAUNCHER,
 	NULL,
@@ -1546,7 +1555,7 @@ always owned, never in the world
 /* pickup */	"HyperBlaster",
 		0,
 		1,
-		"Cells",
+		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_HYPERBLASTER,
 		NULL,

@@ -991,6 +991,9 @@ void Weapon_Blaster_Fire (edict_t *ent)
 	Spreadfire_fire(ent, vec3_origin, damage, false, EF_BLASTER);
 	
 	ent->client->ps.gunframe++;
+
+	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+		ent->client->pers.inventory[ent->client->ammo_index]--;
 }
 
 void Weapon_Blaster (edict_t *ent)
@@ -1216,6 +1219,7 @@ void Weapon_Machinegun (edict_t *ent)
 	Weapon_Generic (ent, 3, 5, 45, 49, pause_frames, fire_frames, Machinegun_Fire);
 }
 
+// TODO: Rename to vulcan cannon
 void Chaingun_Fire (edict_t *ent)
 {
 	int			i;

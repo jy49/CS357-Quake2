@@ -103,7 +103,8 @@ typedef enum
 	AMMO_ROCKETS,
 	AMMO_GRENADES,
 	AMMO_CELLS,
-	AMMO_SLUGS
+	AMMO_SLUGS,
+	AMMO_SECONDARY_SMART_MISSILE
 } ammo_t;
 
 
@@ -846,12 +847,13 @@ typedef struct
 	int			inventory[MAX_ITEMS];
 
 	// ammo capacities
-	int			max_bullets;
-	int			max_shells;
-	int			max_rockets;
-	int			max_grenades;
-	int			max_cells;
-	int			max_slugs;
+	int			max_bullets;	// Bullets:	Vulcan Ammo
+	int			max_shells;		// Shells: Energy (used by all primaries except vulcan)
+	int			max_rockets;	// Rockets: Concussion Missiles
+	int			max_grenades;	// Grenades: Mines
+	int			max_cells;		// Cells: Mega Missile
+	int			max_slugs;		// Slugs: Homing Missile
+	int			max_secondary_smart_missile;	// Smart Missile
 
 	gitem_t		*weapon;
 	gitem_t		*lastweapon;
