@@ -713,6 +713,10 @@ GRENADE LAUNCHER
 ======================================================================
 */
 
+// TODO: Rename to Mines
+// FIXME: Mines don't detonate on touch
+// TODO: Mines should be detonatable by weapons
+// TODO: Mines should be able to hit owner after a few seconds
 void weapon_grenadelauncher_fire (edict_t *ent)
 {
 	vec3_t	offset;
@@ -722,8 +726,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	float	radius;
 
 	radius = damage+40;
-	if (is_quad)
-		damage *= 4;
+
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
@@ -732,7 +735,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
+	fire_grenade (ent, start, forward, damage, 0, 2.5 * 20, radius);
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
