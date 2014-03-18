@@ -644,7 +644,7 @@ void InitClientPersistant (gclient_t *client)
 	client->pers.max_grenades	= 10;	// Mines
 	client->pers.max_cells		= 5;	// Mega Missile
 	client->pers.max_slugs		= 10;	// Homing Missile
-	client->pers.max_secondary_smart_missile = 5;	// Smart Missile
+	client->pers.max_smart_missile = 500;	// Smart Missile
 
 	client->pers.connected = true;
 }
