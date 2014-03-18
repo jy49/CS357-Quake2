@@ -714,9 +714,9 @@ GRENADE LAUNCHER
 */
 
 // TODO: Rename to Mines
-// FIXME: Mines don't detonate on touch
-// TODO: Mines should be detonatable by weapons
-// TODO: Mines should be able to hit owner after a few seconds
+// FIXME: Mines should be detonatable by weapons
+// FIXME: Mines should be able to hit owner after a few seconds
+// FIXME: Mines should have an activation delay
 void weapon_grenadelauncher_fire (edict_t *ent)
 {
 	vec3_t	offset;
@@ -724,6 +724,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	vec3_t	start;
 	int		damage = 120;
 	float	radius;
+	int		lifetime = 180; // Lifetime of a mine in seconds
 
 	radius = damage+40;
 
@@ -735,7 +736,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_grenade (ent, start, forward, damage, 0, 2.5 * 20, radius);
+	fire_grenade (ent, start, forward, damage, 0, lifetime, radius);
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);

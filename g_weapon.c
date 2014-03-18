@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include "g_local.h"
-void rocket_touch(edict_t, edict_t, cplane_t, csurface_t);
 
 
 /*
@@ -484,6 +483,46 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	Grenade_Explode (ent);
 }
 
+// Code courtesy of http://webadvisor.aupr.edu/noc/Othertutorials%5Cqdevels%5C-%20Proximity%20mines%20.html
+
+// CCH: New think function for proximity grenades
+static void proxim_think(edict_t *ent)
+{
+	edict_t *blip = NULL;
+	int detect_distance = 66;
+
+	if (level.time > ent->delay)
+	{
+		Grenade_Explode(ent);
+		return;
+	}
+
+	ent->think = proxim_think;
+
+	while ((blip = findradius(blip, ent->s.origin, detect_distance)) != NULL)
+	{
+		if (!(blip->svflags & SVF_MONSTER) && !blip->client)
+			continue;
+		// TODO: add timer to it can also hit the owner
+		// but should only do so after approx 2 seconds has passed
+		if (blip == ent->owner)
+			continue;
+		// Should explode upon contact with anyone
+//		if (!blip->takedamage)
+//			continue;
+		// Should explode upon contact with anyone
+//		if (blip->health <= 0)
+//			continue;
+		// Detects invisible objects
+//		if (!visible(ent, blip))
+//			continue;
+		ent->think = Grenade_Explode;
+		break;
+	}
+
+	ent->nextthink = level.time + .1;
+}
+
 void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius)
 {
 	edict_t	*grenade;
@@ -507,9 +546,10 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	VectorClear (grenade->maxs);
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade/tris.md2");
 	grenade->owner = self;
-	grenade->touch = rocket_touch;
-	grenade->nextthink = level.time + timer;
-	grenade->think = Grenade_Explode;
+	grenade->touch = Grenade_Touch;
+	grenade->nextthink = level.time + .1;
+	grenade->think = proxim_think;
+	grenade->delay = level.time + timer;
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "grenade";
