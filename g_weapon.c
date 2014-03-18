@@ -491,6 +491,7 @@ static void proxim_think(edict_t *ent)
 	edict_t *blip = NULL;
 	int detect_distance = 66;
 
+	// If time runs out, explode
 	if (level.time > ent->delay)
 	{
 		Grenade_Explode(ent);
@@ -523,6 +524,17 @@ static void proxim_think(edict_t *ent)
 	ent->nextthink = level.time + .1;
 }
 
+// Code Courtesy of http://webadvisor.aupr.edu/noc/Othertutorials%5Cqdevels%5C-%20Vulnerable%20Rockets%20.html
+// Based on existing code for exploding barrels
+
+// CCH: When a grenade 'dies', it blows up next frame
+static void Grenade_Die(edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
+{
+	self->takedamage = DAMAGE_NO;
+	self->nextthink = level.time + .1;
+	self->think = Grenade_Explode;
+}
+
 void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius)
 {
 	edict_t	*grenade;
@@ -553,6 +565,16 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "grenade";
+
+	// CCH: a few more attributes to let the grenade 'die'
+	VectorSet(grenade->mins, -3, -3, 0);
+	VectorSet(grenade->maxs, 3, 3, 6);
+	grenade->mass = 2;
+	grenade->health = 10;
+	grenade->die = Grenade_Die;
+	grenade->takedamage = DAMAGE_YES;
+	grenade->monsterinfo.aiflags = AI_NOSTEP;
+
 
 	gi.linkentity (grenade);
 }

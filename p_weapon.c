@@ -714,7 +714,6 @@ GRENADE LAUNCHER
 */
 
 // TODO: Rename to Mines
-// FIXME: Mines should be detonatable by weapons
 // FIXME: Mines should be able to hit owner after a few seconds
 // FIXME: Mines should have an activation delay
 void weapon_grenadelauncher_fire (edict_t *ent)
