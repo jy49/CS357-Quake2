@@ -221,6 +221,7 @@ qboolean Pickup_AncientHead (edict_t *ent, edict_t *other)
 	return true;
 }
 
+// This is now the ammo rack
 qboolean Pickup_Bandolier (edict_t *ent, edict_t *other)
 {
 	gitem_t	*item;
@@ -235,6 +236,7 @@ qboolean Pickup_Bandolier (edict_t *ent, edict_t *other)
 	if (other->client->pers.max_slugs < 75)
 		other->client->pers.max_slugs = 75;
 
+	/* Ammo rack doesn't give any extra ammo unlike the bandolier
 	item = FindItem("Bullets");
 	if (item)
 	{
@@ -252,6 +254,7 @@ qboolean Pickup_Bandolier (edict_t *ent, edict_t *other)
 		if (other->client->pers.inventory[index] > other->client->pers.max_shells)
 			other->client->pers.inventory[index] = other->client->pers.max_shells;
 	}
+*/
 
 	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
 		SetRespawn (ent, ent->item->quantity);
