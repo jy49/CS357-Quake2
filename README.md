@@ -39,8 +39,8 @@ Compiling:
    6)	Run
 
 * Visual Studio 2013:
-   1)	Open the game.dsp (VC++ 6 Project) and let it convert
-   2)	Change the release type to "Release"
+   1)	Open the game.sln
+   2)	Change the release type to "Release" (if it is not already selected)
    3)	Compile
    4)	dll will be at "..\..\baseq2\gamex86.dll" (it will automatically overwrite the existing one)
    5)	Run
