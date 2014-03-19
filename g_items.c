@@ -36,6 +36,7 @@ void Weapon_GrenadeLauncher (edict_t *ent);
 void Weapon_Railgun (edict_t *ent);
 void Weapon_BFG (edict_t *ent);
 
+void Weapon_Helix_Cannon(edict_t *ent);
 void Weapon_Homing_Missile(edict_t *ent);
 void Weapon_Smart_Missile(edict_t *ent);
 void Weapon_Mega_Missile(edict_t *ent);
@@ -1332,6 +1333,30 @@ always owned, never in the world
 		NULL,
 		0,
 /* precache */ "weapons/blastf1a.wav misc/lasfly.wav"
+	},
+
+	/* weapon_blaster (.3 .3 1) (-16 -16 -16) (16 16 16)
+	always owned, never in the world
+	*/
+	{
+		"weapon_helix_cannon",
+		Pickup_Weapon,
+		Use_Weapon,
+		Drop_Weapon,
+		Weapon_Helix_Cannon,
+		"misc/w_pkup.wav",
+		"models/weapons/g_shotg/tris.md2", EF_ROTATE, // TODO: this is a placeholder
+		"models/weapons/v_blast/tris.md2",
+		/* icon */		"w_blaster",
+		/* pickup */	"Helix Cannon",
+		0,
+		1,
+		"Shells",
+		IT_WEAPON | IT_STAY_COOP,
+		WEAP_BLASTER,
+		NULL,
+		0,
+		/* precache */ "weapons/blastf1a.wav misc/lasfly.wav"
 	},
 
 /*QUAKED weapon_shotgun (.3 .3 1) (-16 -16 -16) (16 16 16)

@@ -983,9 +983,15 @@ struct gclient_s
 
 //	TODO: Implement laser leveling
 //	int			primary_laser_level;
+
+	// True is horizontal, False is Vertical
 	qboolean    primary_spreadfire_updown;
-//	TODO: Implement helix cannon
-//	int			primary_helix_rotation;
+
+	// 0 is horizontal
+	// 1 is diagnal 1
+	// 2 is vertical
+	// 3 is diagnal 2
+	int			primary_helix_rotation;
 //	TODO: Implement Fusion cannon
 //	float		primary_fusioncannon_charge;
 

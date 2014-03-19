@@ -888,7 +888,7 @@ void Weapon_Smart_Missile(edict_t *ent)
 	static int	pause_frames[] = { 25, 33, 42, 50, 0 };
 	static int	fire_frames[] = { 5, 0 };
 
-	Weapon_Generic(ent, 4, 12, 50, 54, pause_frames, fire_frames, Weapon_Homing_Missile_Fire);
+	Weapon_Generic(ent, 4, 12, 50, 54, pause_frames, fire_frames, Weapon_Smart_Missile_Fire);
 }
 
 void Weapon_Mega_Missile_Fire(edict_t *ent)
@@ -1087,6 +1087,158 @@ Spreadfire_fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, int e
 	fire_blaster(ent, rightshot, forward, damage, speed, effect, false);
 }
 
+Helix_Cannon_fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, int effect)
+{
+	vec3_t	forward, right;
+	vec3_t	shot1, shot2, shot3, shot4, shot5,
+			offset1, offset2, offset3, offset4, offset5;
+	int		speed = 575;
+
+	AngleVectors(ent->client->v_angle, forward, right, NULL);
+
+	// Shot 3 - It always fires down the center so doesnt need to be rotated
+	{
+		VectorSet(offset3, 0, 0, ent->viewheight);
+		VectorAdd(offset3, g_offset, offset3);
+		P_ProjectSource(ent->client, ent->s.origin, offset3, forward, right, shot3);
+	}
+
+	if ((ent->client->ps.gunframe == 6) || (ent->client->ps.gunframe == 9))
+		effect = EF_HYPERBLASTER;
+	else
+		effect = 0;
+
+	
+	if (ent->client->primary_helix_rotation == 0)
+	{
+		// Shot1
+		VectorSet(offset1, 0, -32, ent->viewheight);
+		VectorAdd(offset1, g_offset, offset1);
+		P_ProjectSource(ent->client, ent->s.origin, offset1, forward, right, shot1);
+
+		// Shot2
+		VectorSet(offset2, 0, -16, ent->viewheight);
+		VectorAdd(offset2, g_offset, offset2);
+		P_ProjectSource(ent->client, ent->s.origin, offset2, forward, right, shot2);
+
+		// Shot4
+		VectorSet(offset4, 0, 16, ent->viewheight);
+		VectorAdd(offset4, g_offset, offset4);
+		P_ProjectSource(ent->client, ent->s.origin, offset4, forward, right, shot4);
+
+		// Shot5
+		VectorSet(offset5, 0, 32, ent->viewheight);
+		VectorAdd(offset5, g_offset, offset5);
+		P_ProjectSource(ent->client, ent->s.origin, offset5, forward, right, shot5);
+
+		ent->client->primary_helix_rotation = 1;
+	}
+	else if (ent->client->primary_helix_rotation == 1)
+	{
+		// Shot1
+		VectorSet(offset1, 0, -32, ent->viewheight - 32);
+		VectorAdd(offset1, g_offset, offset1);
+		P_ProjectSource(ent->client, ent->s.origin, offset1, forward, right, shot1);
+
+		// Shot2
+		VectorSet(offset2, 0, -16, ent->viewheight - 16);
+		VectorAdd(offset2, g_offset, offset2);
+		P_ProjectSource(ent->client, ent->s.origin, offset2, forward, right, shot2);
+
+		// Shot4
+		VectorSet(offset4, 0, 16, ent->viewheight + 16);
+		VectorAdd(offset4, g_offset, offset4);
+		P_ProjectSource(ent->client, ent->s.origin, offset4, forward, right, shot4);
+
+		// Shot5
+		VectorSet(offset5, 0, 32, ent->viewheight + 32);
+		VectorAdd(offset5, g_offset, offset5);
+		P_ProjectSource(ent->client, ent->s.origin, offset5, forward, right, shot5);
+
+		ent->client->primary_helix_rotation = 2;
+	}
+	else if (ent->client->primary_helix_rotation == 2)
+	{
+		// Shot1
+		VectorSet(offset1, 0, 0, ent->viewheight - 32);
+		VectorAdd(offset1, g_offset, offset1);
+		P_ProjectSource(ent->client, ent->s.origin, offset1, forward, right, shot1);
+
+		// Shot2
+		VectorSet(offset2, 0, 0, ent->viewheight - 16);
+		VectorAdd(offset2, g_offset, offset2);
+		P_ProjectSource(ent->client, ent->s.origin, offset2, forward, right, shot2);
+
+		// Shot4
+		VectorSet(offset4, 0, 0, ent->viewheight + 16);
+		VectorAdd(offset4, g_offset, offset4);
+		P_ProjectSource(ent->client, ent->s.origin, offset4, forward, right, shot4);
+
+		// Shot5
+		VectorSet(offset5, 0, 0, ent->viewheight + 32);
+		VectorAdd(offset5, g_offset, offset5);
+		P_ProjectSource(ent->client, ent->s.origin, offset5, forward, right, shot5);
+
+		ent->client->primary_helix_rotation = 3;
+	}
+	else if (ent->client->primary_helix_rotation == 3)
+	{
+		// Shot1
+		VectorSet(offset1, 0, -32, ent->viewheight + 32);
+		VectorAdd(offset1, g_offset, offset1);
+		P_ProjectSource(ent->client, ent->s.origin, offset1, forward, right, shot1);
+
+		// Shot2
+		VectorSet(offset2, 0, -16, ent->viewheight + 16);
+		VectorAdd(offset2, g_offset, offset2);
+		P_ProjectSource(ent->client, ent->s.origin, offset2, forward, right, shot2);
+
+		// Shot4
+		VectorSet(offset4, 0, 16, ent->viewheight - 16);
+		VectorAdd(offset4, g_offset, offset4);
+		P_ProjectSource(ent->client, ent->s.origin, offset4, forward, right, shot4);
+
+		// Shot5
+		VectorSet(offset5, 0, 32, ent->viewheight - 32);
+		VectorAdd(offset5, g_offset, offset5);
+		P_ProjectSource(ent->client, ent->s.origin, offset5, forward, right, shot5);
+
+		ent->client->primary_helix_rotation = 0;
+	}
+	else // Safety net
+	{
+		ent->client->primary_helix_rotation = 0;
+	}
+
+	fire_blaster(ent, shot1, forward, damage, speed, effect, false);
+	fire_blaster(ent, shot2, forward, damage, speed, effect, false);
+	fire_blaster(ent, shot3, forward, damage, speed, effect, false);
+	fire_blaster(ent, shot4, forward, damage, speed, effect, false);
+	fire_blaster(ent, shot5, forward, damage, speed, effect, false);
+}
+
+void Weapon_Helix_Cannon_Fire(edict_t *ent)
+{
+	int		damage = 15;
+
+	Helix_Cannon_fire(ent, vec3_origin, damage, false, EF_BLASTER);
+
+	ent->client->ps.gunframe++;
+
+	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+		// Nominal acknowledgment that the helix cannon is the heaviest energy drain
+		ent->client->pers.inventory[ent->client->ammo_index] -= 10;
+}
+
+void Weapon_Helix_Cannon(edict_t *ent)
+{
+	static int	pause_frames[] = { 19, 32, 0 };
+	static int	fire_frames[] = { 5, 0 };
+
+	Weapon_Generic(ent, 4, 8, 52, 55, pause_frames, fire_frames, Weapon_Helix_Cannon_Fire);
+}
+
+
 // TODO: Rename to Quad/Laser
 void Weapon_HyperBlaster_Fire (edict_t *ent)
 {
@@ -1159,7 +1311,6 @@ void Weapon_HyperBlaster (edict_t *ent)
 
 	Weapon_Generic (ent, 5, 20, 49, 53, pause_frames, fire_frames, Weapon_HyperBlaster_Fire);
 }
-
 /*
 ======================================================================
 
