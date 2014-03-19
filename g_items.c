@@ -1316,9 +1316,9 @@ always owned, never in the world
 */
 	{
 		"weapon_blaster", 
-		NULL,
+		Pickup_Weapon,
 		Use_Weapon,
-		NULL,
+		Drop_Weapon,
 		Weapon_Blaster,
 		"misc/w_pkup.wav",
 		NULL, 0,
@@ -1326,7 +1326,7 @@ always owned, never in the world
 /* icon */		"w_blaster",
 /* pickup */	"Blaster",
 		0,
-		0,
+		1,
 		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_BLASTER,
