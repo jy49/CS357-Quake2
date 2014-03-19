@@ -239,7 +239,7 @@ qboolean Pickup_Bandolier (edict_t *ent, edict_t *other)
 		other->client->pers.max_slugs = 20;
 		other->client->pers.max_rockets = 40;
 		other->client->pers.max_grenades = 20;
-		other->client->pers.max_smart_missile = 10;
+		other->client->pers.max_secondary_smart_missile = 10;
 
 	/* Ammo rack doesn't give any extra ammo unlike the bandolier
 	item = FindItem("Bullets");
@@ -486,8 +486,8 @@ qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count)
 		max = ent->client->pers.max_cells;
 	else if (item->tag == AMMO_SLUGS)
 		max = ent->client->pers.max_slugs;
-	else if (item->tag == AMMO_SMART_MISSILE)
-		max = ent->client->pers.max_smart_missile;
+	else if (item->tag == AMMO_SECONDARY_SMART_MISSILE)
+		max = ent->client->pers.max_secondary_smart_missile;
 	else
 		return false;
 
@@ -1601,7 +1601,7 @@ always owned, never in the world
 /* pickup */	"BFG10K",
 		0,
 		50,
-		"Smart_Missile",
+		"Cells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_BFG,
 		NULL,
@@ -1726,29 +1726,6 @@ always owned, never in the world
 		NULL,
 		AMMO_SLUGS,
 /* precache */ ""
-	},
-
-/*QUAKED ammo_smart_missile (.3 .3 1) (-16 -16 -16) (16 16 16)
-*/
-	{
-		"ammo_smart_missile",
-		Pickup_Ammo,
-		NULL,
-		Drop_Ammo,
-		NULL,
-		"misc/am_pkup.wav",
-		"models/items/ammo/slugs/medium/tris.md2", 0,
-		NULL,
-		/* icon */		"a_slugs",
-		/* pickup */	"Smart_Missile",
-		/* width */		3,
-		10,
-		NULL,
-		IT_AMMO,
-		0,
-		NULL,
-		AMMO_SMART_MISSILE,
-		/* precache */ ""
 	},
 
 

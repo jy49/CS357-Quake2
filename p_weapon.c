@@ -1530,11 +1530,6 @@ BFG10K
 ======================================================================
 */
 
-// TODO: Rename to Smart Missile
-// Sorta works like a smart missile
-// Smart Missile Logic: fire a medium speed missile
-// that either detonates on contact with a wall, or appox 2 seconds after fire
-// Spawn approx 7 plasma cannon bullets after detonation that can home on enemies
 void weapon_bfg_fire (edict_t *ent)
 {
 	vec3_t	offset, start;
@@ -1542,7 +1537,10 @@ void weapon_bfg_fire (edict_t *ent)
 	int		damage;
 	float	damage_radius = 1000;
 
-	damage = 35;
+	if (deathmatch->value)
+		damage = 200;
+	else
+		damage = 500;
 
 	if (ent->client->ps.gunframe == 9)
 	{
@@ -1560,14 +1558,14 @@ void weapon_bfg_fire (edict_t *ent)
 
 	// cells can go down during windup (from power armor hits), so
 	// check again and abort firing if we don't have enough now
-//	if (ent->client->pers.inventory[ent->client->ammo_index] < 50)
-//	{
-//		ent->client->ps.gunframe++;
-//		return;
-//	}
+	if (ent->client->pers.inventory[ent->client->ammo_index] < 50)
+	{
+		ent->client->ps.gunframe++;
+		return;
+	}
 
-//	if (is_quad)
-//		damage *= 4;
+	if (is_quad)
+		damage *= 4;
 
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
@@ -1587,7 +1585,7 @@ void weapon_bfg_fire (edict_t *ent)
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 1;
+		ent->client->pers.inventory[ent->client->ammo_index] -= 50;
 }
 
 void Weapon_BFG (edict_t *ent)
