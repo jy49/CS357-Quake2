@@ -856,6 +856,41 @@ void Weapon_Homing_Missile(edict_t *ent)
 	Weapon_Generic(ent, 4, 12, 50, 54, pause_frames, fire_frames, Weapon_Homing_Missile_Fire);
 }
 
+void Weapon_Smart_Missile_Fire(edict_t *ent)
+{
+	vec3_t	offset, start;
+	vec3_t	forward, right;
+	// TODO: damage numbers/splash damage range likely dont match real ones
+	int		damage = 35;
+	float	damage_radius = 25;
+	int		radius_damage = 120;
+	int		speed = 600;
+	int		lifetime = 3;
+
+	AngleVectors(ent->client->v_angle, forward, right, NULL);
+	VectorScale(forward, -2, ent->client->kick_origin);
+	ent->client->kick_angles[0] = -1;
+
+	VectorSet(offset, 8, 0, ent->viewheight - 8);
+	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+	fire_smart_missile(ent, start, forward, damage, speed, damage_radius, radius_damage, lifetime);
+
+	ent->client->ps.gunframe++;
+	PlayerNoise(ent, start, PNOISE_WEAPON);
+
+	if (!((int)dmflags->value & DF_INFINITE_AMMO))
+		ent->client->pers.inventory[ent->client->ammo_index]--;
+}
+
+
+void Weapon_Smart_Missile(edict_t *ent)
+{
+	static int	pause_frames[] = { 25, 33, 42, 50, 0 };
+	static int	fire_frames[] = { 5, 0 };
+
+	Weapon_Generic(ent, 4, 12, 50, 54, pause_frames, fire_frames, Weapon_Homing_Missile_Fire);
+}
+
 void Weapon_Mega_Missile_Fire(edict_t *ent)
 {
 	vec3_t	offset, start;

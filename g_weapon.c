@@ -859,6 +859,117 @@ void fire_homing_missile(edict_t *self, vec3_t start, vec3_t dir, int damage, in
 	gi.linkentity(rocket);
 }
 
+static void Smart_Missile_Spawn_Bomblets(edict_t *ent)
+{
+	vec3_t	origin;
+	vec3_t	bomblet1, bomblet2,
+			bomblet3, bomblet4,
+			bomblet5;
+	int		speed	= 300;
+	int		damage	= 20;
+
+	// TODO: Randomize bomblet directions
+	VectorSet(bomblet1, 0, 0, 0);
+	VectorSet(bomblet2, 0, 0, 0);
+	VectorSet(bomblet3, 0, 0, 0);
+	VectorSet(bomblet4, 0, 0, 0);
+	VectorSet(bomblet5, 0, 0, 0);
+
+	// Get origin for spawning blobs
+	gi.WritePosition(origin);
+
+	// TODO: make dedicated homing plasma weapon
+	// Homing missile is placeholder
+	fire_homing_missile(ent, origin, bomblet1, damage, speed, 0, 0);
+	fire_homing_missile(ent, origin, bomblet2, damage, speed, 0, 0);
+	fire_homing_missile(ent, origin, bomblet3, damage, speed, 0, 0);
+	fire_homing_missile(ent, origin, bomblet4, damage, speed, 0, 0);
+	fire_homing_missile(ent, origin, bomblet5, damage, speed, 0, 0);
+}
+
+// Code courtesy of: http://webadvisor.aupr.edu/noc/Othertutorials%5Cqdevels%5C-%20Vulnerable%20Rockets%20.html
+
+// CCH: Explode rocket without touching anything
+static void Smart_Missile_Explode(edict_t *ent)
+{
+	vec3_t         origin;
+
+	if (ent->owner->client)
+		PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
+
+	// calculate position for the explosion entity
+	VectorMA(ent->s.origin, -0.02, ent->velocity, origin);
+	T_RadiusDamage(ent, ent->owner, ent->radius_dmg, NULL, ent->dmg_radius, MOD_ROCKET);
+
+	gi.WriteByte(svc_temp_entity);
+
+	if (ent->waterlevel)
+		gi.WriteByte(TE_ROCKET_EXPLOSION_WATER);
+	else
+		gi.WriteByte(TE_ROCKET_EXPLOSION);
+
+	gi.WritePosition(origin);
+	gi.multicast(ent->s.origin, MULTICAST_PVS);
+	G_FreeEdict(ent);
+
+	// When Smart Missile dies: spawn 5 plasma bomblets
+	Smart_Missile_Spawn_Bomblets(ent);
+}
+
+static void Smart_Missile_Timer(edict_t *ent)
+{
+	// If time runs out, explode
+	if (level.time > ent->delay)
+	{
+		Smart_Missile_Explode(ent);
+		return;
+	}
+
+	ent->think = Smart_Missile_Timer;
+	ent->nextthink = level.time + .1;
+}
+
+static void Smart_Missile_Die(edict_t *self)
+{
+	self->nextthink = level.time + .1;
+	self->think = Smart_Missile_Explode;
+}
+
+void fire_smart_missile(edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage, float timer)
+{
+	edict_t	*rocket;
+
+	rocket = G_Spawn();
+	VectorCopy(start, rocket->s.origin);
+	VectorCopy(dir, rocket->movedir);
+	vectoangles(dir, rocket->s.angles);
+	VectorScale(dir, speed, rocket->velocity);
+	rocket->movetype = MOVETYPE_FLYMISSILE;
+	rocket->clipmask = MASK_SHOT;
+	rocket->solid = SOLID_BBOX;
+	rocket->s.effects |= EF_ROCKET;
+	VectorClear(rocket->mins);
+	VectorClear(rocket->maxs);
+	rocket->s.modelindex = gi.modelindex("models/objects/rocket/tris.md2");
+	rocket->owner = self;
+	rocket->touch = rocket_touch;
+	rocket->nextthink = level.time + 8000 / speed;
+	rocket->think = Smart_Missile_Timer;
+	rocket->nextthink = level.time + .1;
+	rocket->delay = level.time + timer;
+	rocket->die = Smart_Missile_Die;
+	rocket->dmg = damage;
+	rocket->radius_dmg = radius_damage;
+	rocket->dmg_radius = damage_radius;
+	rocket->s.sound = gi.soundindex("weapons/rockfly.wav");
+	rocket->classname = "rocket";
+
+	if (self->client)
+		check_dodge(self, rocket->s.origin, dir, speed);
+
+	gi.linkentity(rocket);
+}
+
 
 /*
 =================

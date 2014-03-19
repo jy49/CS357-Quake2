@@ -853,7 +853,7 @@ typedef struct
 	int			max_grenades;	// Grenades: Mines
 	int			max_cells;		// Cells: Mega Missile
 	int			max_slugs;		// Slugs: Homing Missile
-	int			max_secondary_smart_missile;	// Smart Missile
+	int			max_smart_missile;	// Smart Missile
 
 	gitem_t		*weapon;
 	gitem_t		*lastweapon;
