@@ -22,6 +22,13 @@ Bugs:
 	Mines cannot detonate on player that spawned them
 	Smart missiles do not work properly
 
+Getting source code:
+   1)	Get the Q2 source code from ftp://ftp.idsoftware.com/idstuff/quake2/source/q2src320.exe
+   2)	Point your git client to "https://github.com/jy49/CS357-Quake2.git" and have it save it's contents to
+		"<location of extracted Q2 source code>\game"
+   3)	Overwrite the existing install
+   4)	Go to compile directions
+
 Compiling:
 * Visual Studio 2008: 
    1)	Open the game.dsp (VC++ 6 Project) and let it convert
